@@ -9,66 +9,153 @@ import Object.Karyawan;
 import Object.Manager;
 import Object.Supervisor;
 
-public class main {
+public class Main {
 	
 	Scanner sc = new Scanner(System.in);
-	
-	Vector<Karyawan> karyawan = new Vector<Karyawan>();
 
-	public main() {
-		// TODO Auto-generated constructor stub
-		int choose;
-		do {
+
+	public class UserInputHandler {
+		private Scanner scanner;
+	
+		public UserInputHandler() {
+			scanner = new Scanner(System.in);
+		}
+	
+		public int getMenuChoice() {
+			int choice;
 			try {
-				System.out.println(
-						"1. Insert Data\n" + "2. View Data\n" + "3. Update Data\n" + "4. Delete Data\n" + "5. Exit\n");
+				System.out.println("1. Insert Data\n" +
+						"2. View Data\n" +
+						"3. Update Data\n" +
+						"4. Delete Data\n" +
+						"5. Exit\n");
 				System.out.print("Choose >> ");
-				choose = sc.nextInt();
-				sc.nextLine();
+				choice = scanner.nextInt();
+				scanner.nextLine();
 			} catch (Exception e) {
-				// TODO: handle exception
-				choose = -1;
-				sc.nextLine();
+				choice = -1;
+				scanner.nextLine();
 			}
-			
-			switch(choose) {
-			case 1:
-				add();
-				System.out.println("ENTER to return");
-				sc.nextLine();
-				break;
-			case 2:
-				read();
-				System.out.println("ENTER to return");
-				sc.nextLine();
-				break;
-			case 3:
-				update();
-				System.out.println("ENTER to return");
-				sc.nextLine();
-				break;
-			case 4:
-				delete();
-				System.out.println("ENTER to return");
-				sc.nextLine();
-				break;
-			case 5:
-				choose = 5;
-				break;
-			default:
-				System.out.println("Tolong input angka sesuai menu.");
-				sc.nextLine();
-			}
-		} while (choose != 5);
-		
-		System.out.println("Thank you...");
-		
+			return choice;
+		}
+	
+		public String nextLine() {
+			return scanner.nextLine();
+		}
 	}
 	
-	public void add() {
+
+    private UserInputHandler userInputHandler;
+    private EmployeeManager employeeManager;
+	Vector<Karyawan> karyawan = new Vector<Karyawan>();
+    private EmployeeOperations employeeOperations;
+
+    public Main() {
+        userInputHandler = new UserInputHandler();
+        employeeManager = new EmployeeManager();
+        employeeOperations = new EmployeeOperations(employeeManager);
+
+        int choice;
+        do {
+            choice = userInputHandler.getMenuChoice();
+            switch (choice) {
+                case 1:
+                    employeeOperations.addEmployee();
+                    System.out.println("ENTER to return");
+                    userInputHandler.nextLine();
+                    break;
+                case 2:
+                    employeeManager.displayKaryawan();
+                    System.out.println("ENTER to return");
+                    userInputHandler.nextLine();
+                    break;
+                case 3:
+                    employeeOperations.updateEmployee();
+                    System.out.println("ENTER to return");
+                    userInputHandler.nextLine();
+                    break;
+                case 4:
+                    employeeOperations.deleteEmployee();
+                    System.out.println("ENTER to return");
+                    userInputHandler.nextLine();
+                    break;
+                case 5:
+                    break;
+                default:
+                    System.out.println("Tolong input angka sesuai menu.");
+                    userInputHandler.nextLine();
+            }
+        } while (choice != 5);
+
+        System.out.println("Thank you...");
+    }
+
+
+public class EmployeeManager {
+    private Vector<Karyawan> karyawan;
+    private int employeeCounter;
+
+    public EmployeeManager() {
+        karyawan = new Vector<Karyawan>();
+        employeeCounter = 0;
+    }
+
+    public void addKaryawan(Karyawan karyawan) {
+        this.karyawan.add(karyawan);
+        employeeCounter++;
+    }
+    
+    public void updateKaryawan(int index, Karyawan karyawan) {
+        this.karyawan.set(index, karyawan);
+    }
+
+    public void deleteKaryawan(int index) {
+        this.karyawan.remove(index);
+        employeeCounter--;
+    }
+    
+    public void displayKaryawan() {
+        if (!karyawan.isEmpty()) {
+				System.out.println("|----|-----------------|------------------------------|---------------|--------------|-------------|");
+				System.out.println("|No  |Kode Karyawan    |Nama Karyawan                 |Jenis Kelamin  |Jabatan       |Gaji Karyawan|");
+				System.out.println("|----|-----------------|------------------------------|---------------|--------------|-------------|");
+				int i = 1;
+				for(Karyawan karyawan : karyawan) {
+					if(karyawan instanceof Manager) {
+						Manager e = (Manager) karyawan;
+						System.out.printf("|%4d|%17s|%30s|%15s|%14s|%13d|\n", i++, e.getKode(), e.getNama(), e.getGender(), e.getJabatan(), e.getGaji());
+					}
+					else if(karyawan instanceof Supervisor) {
+						Supervisor e = (Supervisor) karyawan;
+						System.out.printf("|%4d|%17s|%30s|%15s|%14s|%13d|\n", i++, e.getKode(), e.getNama(), e.getGender(), e.getJabatan(), e.getGaji());
+					}
+					else {
+						Admin e = (Admin) karyawan;
+						System.out.printf("|%4d|%17s|%30s|%15s|%14s|%13d|\n", i++, e.getKode(), e.getNama(), e.getGender(), e.getJabatan(), e.getGaji());
+					}
+				}
+				System.out.println("|----|-----------------|------------------------------|---------------|--------------|-------------|");
+			}
+			else {
+				System.out.println("Tidak ada data");
+			}
+        }
+    }
+
+
+public class EmployeeOperations {
+    private EmployeeManager employeeManager;
+	private int i;
+
+    public EmployeeOperations(EmployeeManager employeeManager) {
+        this.employeeManager = employeeManager;
+    }
+
+    public void addEmployee() {
 		String kode, nama, gender, jabatan;
 		int gaji;
-		
+
+
 		String alphabet = "";
 		char letter = 65; // ASCII Value 65 = Capital A
 		for(int x=0; x<26; x++) {
@@ -137,41 +224,13 @@ public class main {
 		}
 		
 		System.out.println("Berhasil menambahkan karyawan dengan id " + kode);
-		
-	}
-	
-	public void read() {
-		if(!karyawan.isEmpty()) {
-			System.out.println("|----|-----------------|------------------------------|---------------|--------------|-------------|");
-			System.out.println("|No  |Kode Karyawan    |Nama Karyawan                 |Jenis Kelamin  |Jabatan       |Gaji Karyawan|");
-			System.out.println("|----|-----------------|------------------------------|---------------|--------------|-------------|");
-			int i = 1;
-			for(Karyawan karyawan : karyawan) {
-				if(karyawan instanceof Manager) {
-					Manager e = (Manager) karyawan;
-					System.out.printf("|%4d|%17s|%30s|%15s|%14s|%13d|\n", i++, e.getKode(), e.getNama(), e.getGender(), e.getJabatan(), e.getGaji());
-				}
-				else if(karyawan instanceof Supervisor) {
-					Supervisor e = (Supervisor) karyawan;
-					System.out.printf("|%4d|%17s|%30s|%15s|%14s|%13d|\n", i++, e.getKode(), e.getNama(), e.getGender(), e.getJabatan(), e.getGaji());
-				}
-				else {
-					Admin e = (Admin) karyawan;
-					System.out.printf("|%4d|%17s|%30s|%15s|%14s|%13d|\n", i++, e.getKode(), e.getNama(), e.getGender(), e.getJabatan(), e.getGaji());
-				}
-			}
-			System.out.println("|----|-----------------|------------------------------|---------------|--------------|-------------|");
-		}
-		else {
-			System.out.println("Tidak ada data");
-		}
-	}
-	
-	public void update() {
-		String kode, nama, gender, jabatan;
+    }
+    
+    public void updateEmployee() {
+        String kode, nama, gender, jabatan;
 		int gaji;
 		if(!karyawan.isEmpty()) {
-			read();
+			employeeManager.displayKaryawan();
 			int idx;
 			do {
 				try {
@@ -232,11 +291,11 @@ public class main {
 		else {
 			System.out.println("Tidak ada data yang bisa diupdate");
 		}
-	}
-	
-	public void delete() {
+    }
+    
+    public void deleteEmployee() {
 		if(!karyawan.isEmpty()) {
-			read();
+			employeeManager.displayKaryawan();
 			int idx;
 			do {
 				try {
@@ -260,10 +319,10 @@ public class main {
 			System.out.println("Tidak ada data yang bisa dihapus");
 		}
 	}
+    }
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		new main();
-	}
+    public static void main(String[] args) {
+        new Main();
+    }
 
 }
